@@ -7,7 +7,7 @@ use strict;
 
 use parent 'Plack::Middleware';
 
-use Plack::Util::Accessor qw(client setup_cb cache_args);
+use Plack::Util::Accessor qw(client setup_cb scrape_cb cache_args);
 use Prometheus::Tiny::Shared;
 
 sub prepare_app {
@@ -22,6 +22,7 @@ sub call {
 
   if ($env->{PATH_INFO} =~ m{/metrics}) {
     return [ 405, [], [] ] unless $env->{REQUEST_METHOD} eq 'GET';
+    $self->scrape_cb->($self->client) if $self->scrape_cb;
     return [ 200, [ 'Content-Type' => 'text/plain' ], [ $self->client->format ] ];
   }
 
