@@ -7,13 +7,13 @@ use strict;
 
 use parent 'Plack::Middleware';
 
-use Plack::Util::Accessor qw(client setup_cb scrape_cb cache_args);
-use Prometheus::Tiny::Shared;
+use Plack::Util::Accessor qw(client setup_cb scrape_cb filename);
+use Prometheus::Tiny::Shared 0.010;
 
 sub prepare_app {
   my ($self) = @_;
 
-  $self->client(Prometheus::Tiny::Shared->new(cache_args => ($self->cache_args || {})));
+  $self->client(Prometheus::Tiny::Shared->new($self->filename ? (filename => $self->filename) : ()));
   $self->setup_cb->($self->client) if $self->setup_cb;
 }
 
