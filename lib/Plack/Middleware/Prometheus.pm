@@ -8,12 +8,19 @@ use strict;
 use parent 'Plack::Middleware';
 
 use Plack::Util::Accessor qw(client setup_cb scrape_cb filename);
-use Prometheus::Tiny::Shared 0.010;
+use Prometheus::Tiny::Shared 0.011;
 
 sub prepare_app {
   my ($self) = @_;
 
-  $self->client(Prometheus::Tiny::Shared->new($self->filename ? (filename => $self->filename) : ()));
+  $self->client(
+    Prometheus::Tiny::Shared->new(
+      $self->filename ? (
+        filename  => $self->filename,
+        init_file => 1,
+      ) : (),
+    )
+  );
   $self->setup_cb->($self->client) if $self->setup_cb;
 }
 
